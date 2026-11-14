@@ -1,22 +1,26 @@
 NAME = libftprintf.a
-SRCFILES =  ft_printf.c
-OFILES = $(SRCFILES:.c=.o)
-CFLAGS = -Wall -Wextra -Werror 
+src = ft_printf.c ft_putnbr_base.c ft_putptr.c 
+obj = $(src:.c=.o)
+CC = cc 
+CFLAGS = -Wall -Werror -Wextra
+AR = ar
+ARFLAGS = rcs
+RM = rm -f
 
 all: $(NAME)
 
-$(NAME):$(OFILES)
-	ar rcs $(NAME) $(OFILES)
+$(NAME):$(obj)
+	$(AR) $(ARFLAGS) $(NAME) $(obj)
 
-%.o:%.c
-	cc -c $(CFLAGS) $< -o $@
+%.o:%.c ft_printf.h
+	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
-	rm -f $(OFILES)
+	$(RM) $(obj)
 
-fclean:clean	
-	rm -f $(NAME)
+fclean:clean 
+	$(RM) $(NAME)
 
-re: fclean all
+re:fclean all 
 
-.PHONY: clean fclean all re
+.PHONY: all clean fclean re

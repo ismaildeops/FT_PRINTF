@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include<unistd.h>
 int ft_putnbr_base(unsigned long nbr, char *base);
 int ft_putptr(void *ptr)
@@ -24,3 +25,20 @@ int main(void)
     return (0);
 }
 
+=======
+#include "ft_printf.h"
+
+int ft_putptr(void *ptr)
+{
+	if (ptr == NULL)
+	{
+    	write(1, "(nil)", 5);
+    	return (5);
+	}
+	unsigned long address;
+	address = (unsigned long)ptr;
+	write(1, "0x", 2);
+	int count = ft_putnbr_base(address , "0123456789abcdef");
+	return (count + 2);
+}
+>>>>>>> aa40941 (Add Tests Folder)

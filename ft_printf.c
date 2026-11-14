@@ -1,94 +1,111 @@
-#include <stdarg.h>
-#include <unistd.h>
-#include<stdlib.h>
-#include "Libft/libft.h"
 
-static int count_len(int n)
+#include "ft_printf.h"
+
+static int	ft_putstr(char *s)
 {
-    int len = 0;
-    long nb = n;
+	size_t	s_len;
+	size_t	i;
 
-    if (nb == 0)
-        return (1);
-    if (nb < 0)
-    {
-        len++;
-        nb = -nb;
-    }
-    while (nb > 0)
-    {
-        nb /= 10;
-        len++;
-    }
-    return (len);
-}
-int ft_printf(const char *format, ...)
-{
-    va_list ap;
-    int count = 0;
-    int i = 0;
-    int nb;
-    char *s;
-    char c;
-    if (!format)
-        return (-1);
-    va_start(ap, format);
-    while (format[i])
-    {
-        if (format[i] == '%')
-        {
-            if (format[i + 1] == '\0')
-                break;
-            if (format[i + 1] == 'd' || format[i + 1] == 'i')
-            {
-                nb = va_arg(ap, int);
-                ft_putnbr_fd(nb, 1);
-                count = count + count_len(nb);
-            }
-            if(format[i + 1] == 'c')
-            {
-                c = va_arg(ap, int);
-                write(1,&c,1);
-                count++;
-            }
-            if(format[i+1] == 's')
-            {
-                s = va_arg(ap, char *);
-                ft_putstr_fd(s,1);
-                count = count + ft_strlen(s);
-            }
-            if(format[i + 1] == '%')
-            {
-                write(1,"%",1);
-                count++;
-            }
-            if(format[i+1] == 'u')
-            {
-                nb = (unsigned int)nb;
-                nb = va_arg(ap,unsigned int);
-
-            }
-            i = i + 2;
-        }
-        else
-        {
-            write(1, &format[i], 1);
-            count++;
-            i++;
-        }
-    }
-    va_end(ap);
-    return (count);
+	s_len = 0;
+	i = 0;
+	if (!s)
+		s = "(null)";
+	while (s[s_len])
+		s_len++;
+	while (s[i])
+	{
+		write(1, &s[i], 1);
+		i++;
+	}
+	return (s_len);
 }
 
-int main()
+static int	ft_putnbr(int n)
 {
-    ft_printf("my name %s and my age is %d\n", "ismail", 19);
+	long	m;
+	char	c;
+	int		count;
+
+	m = n;
+	count = 0;
+	if (m < 0)
+	{
+		write(1, "-", 1);
+		count++;
+		m = -m;
+	}
+	if (m >= 10)
+		count += ft_putnbr(m / 10);
+	c = m % 10 + '0';
+	write(1, &c, 1);
+	return (count + 1);
 }
 
-/*
-• %p The void * pointer argument has to be printed in hexadecimal format.
-• %u Prints an unsigned decimal (base 10) number.
-• %x Prints a number in hexadecimal (base 16) lowercase format.
-• %X Prints a number in hexadecimal (base 16) uppercase format.
-*/
+static int	ft_putnbr_u(unsigned int n)
+{
+	char	c;
+	int		count;
+
+	count = 0;
+	if (n >= 10)
+		count += ft_putnbr_u(n / 10);
+	c = n % 10 + '0';
+	write(1, &c, 1);
+	return (count + 1);
+}
+
+int	ft_printf(const char *format, ...)
+{
+	va_list	args;
+	size_t	i;
+	int		count;
+	char	c;
+
+	i = 0;
+	count = 0;
+	va_start(args, format);
+	while (format[i])
+	{
+		if (format[i] == '%' && format[i + 1])
+		{
+			if (format[i + 1] == 'd' || format[i + 1] == 'i')
+				count += ft_putnbr(va_arg(args, int));
+			else if (format[i + 1] == 'u')
+				count += ft_putnbr_u(va_arg(args, unsigned int));
+			else if (format[i + 1] == 's')
+				count += ft_putstr(va_arg(args, char *));
+			else if (format[i + 1] == 'x')
+				count += ft_putnbr_base(va_arg(args, unsigned int), "0123456789abcdef");
+			else if (format[i + 1] == 'X')
+				count += ft_putnbr_base(va_arg(args, unsigned int), "0123456789ABCDEF");
+			else if (format[i + 1] == 'p' && format[i + 1])
+				count += ft_putptr(va_arg(args, void *));
+			else if (format[i + 1] == 'c')
+			{
+				c = va_arg(args, int);
+				write(1, &c, 1);
+				count++;
+			}
+			else if (format[i + 1] == '%')
+			{
+				write(1, "%", 1);
+				count++;
+			}
+			else
+			{
+				write(1, &format[i], 1);
+				write(1, &format[i + 1], 1);
+				count += 2;
+			}
+			i += 2;
+		}
+		else
+		{
+			write(1, &format[i], 1);
+			count++;
+			i++;
+		}
+	}
+	va_end(args);
+	return (count);
+}
