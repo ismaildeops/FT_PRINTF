@@ -54,12 +54,52 @@ static int	ft_putnbr_u(unsigned int n)
 	return (count + 1);
 }
 
+static int	ft_format(va_list *args, char type)
+{
+	char	c;
+
+	if (type == 'd' || type == 'i')
+		return (ft_putnbr(va_arg(*args, int)));
+	if (type == 'u')
+		return (ft_putnbr_u(va_arg(*args, unsigned int)));
+	if (type == 's')
+		return (ft_putstr(va_arg(*args, char *)));
+	if (type == 'x' || type == 'X')
+		return (ft_putnbr_base(va_arg(*args, unsigned int),
+				type == 'x' ? "0123456789abcdef" : "0123456789ABCDEF"));
+	if (type == 'p')
+		return (ft_putptr(va_arg(*args, void *)));
+	if (type == 'c')
+	{
+		c = va_arg(*args, int);
+		write(1, &c, 1);
+		return (1);
+	}
+	if (type == '%')
+		return (write(1, "%", 1));
+	return (-1);
+}
+
+static int	ft_handle_format(va_list *args, const char *format, size_t *i)
+{
+	int	count;
+
+	count = ft_format(args, format[*i + 1]);
+	if (count < 0)
+	{
+		write(1, &format[*i], 1);
+		write(1, &format[*i + 1], 1);
+		count = 2;
+	}
+	*i += 2;
+	return (count);
+}
+
 int	ft_printf(const char *format, ...)
 {
 	va_list	args;
 	size_t	i;
 	int		count;
-	char	c;
 
 	i = 0;
 	count = 0;
@@ -67,38 +107,7 @@ int	ft_printf(const char *format, ...)
 	while (format[i])
 	{
 		if (format[i] == '%' && format[i + 1])
-		{
-			if (format[i + 1] == 'd' || format[i + 1] == 'i')
-				count += ft_putnbr(va_arg(args, int));
-			else if (format[i + 1] == 'u')
-				count += ft_putnbr_u(va_arg(args, unsigned int));
-			else if (format[i + 1] == 's')
-				count += ft_putstr(va_arg(args, char *));
-			else if (format[i + 1] == 'x')
-				count += ft_putnbr_base(va_arg(args, unsigned int), "0123456789abcdef");
-			else if (format[i + 1] == 'X')
-				count += ft_putnbr_base(va_arg(args, unsigned int), "0123456789ABCDEF");
-			else if (format[i + 1] == 'p' && format[i + 1])
-				count += ft_putptr(va_arg(args, void *));
-			else if (format[i + 1] == 'c')
-			{
-				c = va_arg(args, int);
-				write(1, &c, 1);
-				count++;
-			}
-			else if (format[i + 1] == '%')
-			{
-				write(1, "%", 1);
-				count++;
-			}
-			else
-			{
-				write(1, &format[i], 1);
-				write(1, &format[i + 1], 1);
-				count += 2;
-			}
-			i += 2;
-		}
+			count += ft_handle_format(&args, format, &i);
 		else
 		{
 			write(1, &format[i], 1);

@@ -1,44 +1,14 @@
-<<<<<<< HEAD
-#include<unistd.h>
-int ft_putnbr_base(unsigned long nbr, char *base);
-int ft_putptr(void *ptr)
-{
-	unsigned long address;
-	address = (unsigned long)ptr;
-	write(1, "0x", 2);
-	int count = ft_putnbr_base(address , "0123456789ABCDEF");
-	return (count + 2);
-}
-
-
-#include <unistd.h>
-#include<stdio.h>
-
-int main(void)
-{
-    int x = 42;
-    char c = 'A';
-    char *str = "Hello";
-    int n = ft_putptr(str);
-    printf("\n");
-    printf("%d", n);
-    return (0);
-}
-
-=======
 #include "ft_printf.h"
 
-int ft_putptr(void *ptr)
+int	ft_putptr(void *ptr)
 {
+	unsigned long	address;
+	int				count;
+
 	if (ptr == NULL)
-	{
-    	write(1, "(nil)", 5);
-    	return (5);
-	}
-	unsigned long address;
+		return (write(1, "(nil)", 5));
 	address = (unsigned long)ptr;
 	write(1, "0x", 2);
-	int count = ft_putnbr_base(address , "0123456789abcdef");
+	count = ft_putnbr_base(address, "0123456789abcdef");
 	return (count + 2);
 }
->>>>>>> aa40941 (Add Tests Folder)
