@@ -12,16 +12,18 @@
 
 #include "ft_printf.h"
 
-int ft_putptr(void *ptr)
+int	ft_putptr(void *ptr)
 {
+	unsigned long	address;
+	int				count;
+
 	if (ptr == NULL)
 	{
-    	write(1, "(nil)", 5);
-    	return (5);
+		write(1, "(nil)", 5);
+		return (5);
 	}
-	unsigned long address;
 	address = (unsigned long)ptr;
 	write(1, "0x", 2);
-	int count = ft_putnbr_base(address , "0123456789abcdef");
+	count = ft_putnbr_base(address, "0123456789abcdef");
 	return (count + 2);
 }

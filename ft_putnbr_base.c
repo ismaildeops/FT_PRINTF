@@ -10,14 +10,17 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include<unistd.h>
-int ft_putnbr_base(unsigned long nbr, char *base)
+#include "ft_printf.h"
+
+int	ft_putnbr_base(unsigned long nbr, char *base)
 {
 	int	count;
+	int	n;
+
 	count = 0;
-	if(nbr >= 16)
+	if (nbr >= 16)
 		count += ft_putnbr_base(nbr / 16, base);
-	int n = nbr % 16;
-	write(1,&base[n],1);
-	return (count + 1);	
+	n = nbr % 16;
+	write(1, &base[n], 1);
+	return (count + 1);
 }
